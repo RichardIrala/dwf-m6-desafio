@@ -1,0 +1,19 @@
+{
+  "name": "desafio",
+  "version": "1.0.0",
+  "author": "Richard Miguel Irala <richardirala47@hotmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@parcel/transformer-image": "^2.5.0",
+    "@vaadin/router": "^1.7.4",
+    "parcel": "^2.5.0",
+    "sweetalert2": "^11.4.10"
+  },
+  "scripts": {
+    "dev": "parcel serve ./src/index.html",
+    "build": "parcel build ./src/index.html"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.31"
+  }
+}
