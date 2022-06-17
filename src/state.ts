@@ -1,4 +1,3 @@
-import { createHistogram } from "perf_hooks";
 const piedra = require("url:./components/imgs/piedra.svg");
 const papel = require("url:./components/imgs/papel.svg");
 const tijera = require("url:./components/imgs/tijera.svg");
@@ -32,6 +31,7 @@ const state = {
     // Pero si la hay, que la setee en el estado
     this.setState(localData);
   },
+
   getState() {
     return this.data;
   },
@@ -42,6 +42,7 @@ const state = {
       cb();
     }
   },
+
   subscribe(callback: (any) => any) {
     console.log("hecho");
     this.listeners.push(callback);
@@ -71,6 +72,7 @@ const state = {
     cs.game.play.myPlay = myPlay;
     this.setState(cs);
   },
+
   computerSetJugada(jugada: number) {
     const cs = this.getState();
     var computerPlay;
@@ -100,6 +102,7 @@ const state = {
       alert("error");
     }
   },
+
   renderAnimationCombat() {
     const root = document.querySelector(".root");
     const style = document.createElement("style");
@@ -178,7 +181,7 @@ const state = {
         return tijera;
       }
     }
-    console.log(jugadas, "sSOMOSMOSMOS");
+    // console.log(jugadas, "sSOMOSMOSMOS");
     jugadas.myPlay != ""
       ? (root.innerHTML = `
       <img class="pc-play-now" src=${pcPlay()}>
@@ -189,6 +192,7 @@ const state = {
       : (root.innerHTML = `NO JUGASTE BRO`);
     root.appendChild(style);
   },
+
   renderGanador() {
     // for (const cb of this.listener) {
     //   cb();
@@ -254,4 +258,5 @@ const state = {
     }
   },
 };
+
 export { state };

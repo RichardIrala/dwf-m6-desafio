@@ -46,6 +46,9 @@ customElements.define(
         // Router.go("/game-instructions");
         console.log("nuevo juego");
       });
+      this.shadow.querySelector(".join-game").addEventListener("click", () => {
+        Router.go("/ingresar-a-una-sala");
+      });
     }
   }
 );
