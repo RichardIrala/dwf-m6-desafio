@@ -21,16 +21,19 @@ customElements.define(
       div.innerHTML = ` 
         <game-title></game-title>
         <form class="form-new-room">
+            <label class="form-new-room__my-email--label">
+                <span>Tu email</span>
+                <input type="text" name="my-email" class="form-new-room__myemail"/>
+            </label>
             <label class="form-new-room__my-name--label">
                 <span>Tu nombre</span>
-                <input type="text" name="my-name"class="form-new-room__myname"/>
+                <input type="text" name="my-name" class="form-new-room__myname"/>
             </label>
             
             <button class="submit-button" type="submit">
                 <game-button-blue class="ir-a">Empezar</game-button-blue>
             </button>
         </form>
-        <ppot-el></ppot-el>
         <homepage-icon></homepage-icon>
       `;
       style.innerHTML = `
@@ -52,12 +55,12 @@ customElements.define(
             flex-direction: column;
             gap: 20px;
         }
-        .form-new-room__my-name--label {
+        .form-new-room__my-name--label, .form-new-room__my-email--label {
             display: flex;
             flex-direction: column;
             align-items: center;
         }
-        .form-new-room__myname {
+        .form-new-room__myname, .form-new-room__myemail {
             width: 322px;
             height: 98px;
             font-size: 45px;
@@ -78,6 +81,7 @@ customElements.define(
           e.preventDefault();
           //My-name es el name del input del formulario
           console.log(e.target["my-name"].value);
+          console.log(e.target["my-email"].value);
         });
     }
   }
