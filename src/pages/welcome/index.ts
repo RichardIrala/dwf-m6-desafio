@@ -15,12 +15,6 @@ const infoColumns = [
     number: 1,
   },
   {
-    title: "Notas",
-    image: notesIcon,
-    description: "Utiliza esta sección para anotar tus tareas pendientes",
-    number: 2,
-  },
-  {
     title: "Contactame",
     image: formIcon,
     description: "Por el momento esta página no esta disponible...",
@@ -62,7 +56,6 @@ customElements.define(
       <div class="header__form__inputs">
         <select class="header__form__inputs--select" name="headerForm">
           <option value="jugar" selected>Jugar Piedra papel o Tijeras</option>
-          <option value="anotador">Anotar tareas pendientes</option>
           <option value="contactarme">Contactarme</option>
         </select>
         <input class="submit-icon" type="image" src=${submitIcon}>
@@ -242,7 +235,6 @@ customElements.define(
           } else if (valorDelForm == "jugar") {
             Router.go("/inicio-game");
           } else if (valorDelForm == "anotador") {
-            console.log("NO EXISTE AUN");
           }
         });
     }
