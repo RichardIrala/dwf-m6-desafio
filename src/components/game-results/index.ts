@@ -1,4 +1,4 @@
-import { gamePage } from "../../pages/play-game";
+import { Router } from "@vaadin/router";
 import { state } from "../../state";
 //SOLO SE PUEDE USAR 1 vez por página
 customElements.define(
@@ -106,16 +106,7 @@ customElements.define(
       this.shadow
         .querySelector(".game-results__volver-a-jugar")
         .addEventListener("click", () => {
-          const BASE_PATH = "/desafio-m5";
-          function isGithubPages() {
-            return location.host.includes("github.io");
-          }
-          //Esto es un router manual solo para este componente que simula ser una página pero no lo es
-          const completePath = isGithubPages()
-            ? BASE_PATH + "/play-game"
-            : "/play-game";
-          history.pushState({}, "", completePath);
-          gamePage();
+          Router.go("/game-instructions");
         });
       //ESTO COMENTADO ES UNA MANERA DE EDITAR EL SHADOW DE OTRO COMPONENTE
       // const resultadoDeljuego = this.shadow.querySelector("game-button-blue");

@@ -14,6 +14,7 @@ customElements.define(
       this.addListeners();
     }
     render() {
+      document.querySelector(".root").innerHTML = ``;
       this.shadow.innerHTML = ``;
       const div = document.createElement("div");
       div.classList.add("principal-container");
@@ -25,6 +26,10 @@ customElements.define(
         <homepage-icon></homepage-icon>
       `;
       style.innerHTML = `
+        * {
+          margin: 0;
+          box-sizing: border-box;
+        }
         .principal-container {
           background: url(${fondoDelJuego});
           background-size: cover;

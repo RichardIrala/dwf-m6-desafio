@@ -1,10 +1,8 @@
 import { Router } from "@vaadin/router";
 
 const fondoDelJuego = require("url:../../components/imgs/fondo.svg");
-
-//Inicio el juego de piedra papel o tijeras
 customElements.define(
-  "inicio-game-el",
+  "inicio-game-element",
   class extends HTMLElement {
     shadow = this.attachShadow({ mode: "open" });
     constructor() {
@@ -20,14 +18,14 @@ customElements.define(
 
       div.innerHTML = ` 
         <game-title></game-title>
-        <game-button-blue class="ir-a">Empezar</game-button-blue>
+        <game-button-blue class="ir-a new-game">Nuevo Juego</game-button-blue>
+        <game-button-blue class="ir-a join-game">Ingresar a una sala</game-button-blue>
         <ppot-el></ppot-el>
         <homepage-icon></homepage-icon>
       `;
       style.innerHTML = `
         * {
-          margin: 0;
-          box-sizing: border-box;
+            box-sizing: border-box;
         }
         .principal-container {
           background: url(${fondoDelJuego});
@@ -44,8 +42,9 @@ customElements.define(
       this.shadow.appendChild(style);
     }
     addListeners() {
-      this.shadow.querySelector(".ir-a").addEventListener("click", () => {
-        Router.go("/game-instructions");
+      this.shadow.querySelector(".new-game").addEventListener("click", () => {
+        // Router.go("/game-instructions");
+        console.log("nuevo juego");
       });
     }
   }

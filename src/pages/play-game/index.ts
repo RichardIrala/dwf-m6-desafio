@@ -23,6 +23,10 @@ customElements.define(
         <ppot-el></ppot-el>
       `;
       style.innerHTML = `
+        * {
+          margin: 0;
+          box-sizing: border-box;
+        }
         .play-game__contador-container {
           display: flex; justify-content: center; align-items: center;
           width: 243px; height: 243px;
