@@ -64,6 +64,7 @@ customElements.define(
             width: 322px;
             height: 98px;
             font-size: 45px;
+            border: solid rgba(24, 36, 96, 1);
         }
         .submit-button {
             padding: 0;
@@ -79,9 +80,17 @@ customElements.define(
         .querySelector(".form-new-room")
         .addEventListener("submit", (e) => {
           e.preventDefault();
-          //My-name es el name del input del formulario
-          console.log(e.target["my-name"].value);
-          console.log(e.target["my-email"].value);
+          if (
+            e.target["my-name"].value != "" &&
+            e.target["my-email"].value != ""
+          ) {
+            //My-name es el name del input del formulario
+            console.log(e.target["my-name"].value);
+            console.log(e.target["my-email"].value);
+            Router.go("/inicio-game");
+          } else {
+            console.log("Falta completar casillas");
+          }
         });
     }
   }

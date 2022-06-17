@@ -233,7 +233,7 @@ customElements.define(
           if (valorDelForm == "contactarme") {
             console.log("CONTACTADOWEY");
           } else if (valorDelForm == "jugar") {
-            Router.go("/inicio-game");
+            Router.go("/welcome-game");
           } else if (valorDelForm == "anotador") {
           }
         });
