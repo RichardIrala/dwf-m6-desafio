@@ -19,6 +19,7 @@ const chatroomsRef = db.ref(`/rooms/321321`);
 
 //Este método indica a chatroomsRef que escuche los cambios en /chatrooms
 chatroomsRef.on("value", (snapshot) => {
+  console.log("puta");
   const valor = snapshot.val();
   // console.log(valor);
   const arrayValor = lodash.map(valor);
