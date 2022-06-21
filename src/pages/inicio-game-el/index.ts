@@ -1,4 +1,5 @@
 import { Router } from "@vaadin/router";
+import { state } from "../../state";
 
 const fondoDelJuego = require("url:../../components/imgs/fondo.svg");
 customElements.define(
@@ -45,6 +46,7 @@ customElements.define(
       this.shadow.querySelector(".new-game").addEventListener("click", () => {
         // Router.go("/game-instructions");
         console.log("nuevo juego");
+        state.newRoom();
       });
       this.shadow.querySelector(".join-game").addEventListener("click", () => {
         Router.go("/ingresar-a-una-sala");
