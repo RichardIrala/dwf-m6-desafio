@@ -1,8 +1,15 @@
+import { rtdbFrontEnd } from "./rtdb";
+import lodash from "lodash";
+import { Router } from "@vaadin/router";
+
 const piedra = require("url:./components/imgs/piedra.svg");
 const papel = require("url:./components/imgs/papel.svg");
 const tijera = require("url:./components/imgs/tijera.svg");
 const state = {
   data: {
+    roomRef: "",
+    rtdbData: {},
+    me: {},
     game: {
       play: {
         myPlay: "",
@@ -21,8 +28,8 @@ const state = {
     console.log(state.data.game.play);
   },
   init() {
-    // Busco data existente en el localStorage
-    const localData = JSON.parse(localStorage.getItem("mod6-desafio"));
+    // Busco data existente en el sessionStorage
+    const localData = JSON.parse(sessionStorage.getItem("mod6-desafio"));
 
     if (!localData) {
       // Si no hay data, que no haga nada
@@ -256,6 +263,100 @@ const state = {
     } else {
       root.innerHTML = `<game-results>ELEGI ALGO</game-results>`;
     }
+  },
+  async setRoomRef(realRoomId) {
+    //ID de room en la realtimeDB
+    this.data.roomRef = realRoomId;
+  },
+  async listenDatabase() {
+    // rtdbFrontEnd;
+    const chatroomsRef = rtdbFrontEnd.ref(`/rooms/${this.data.roomRef}`);
+    // console.log(roomLongId);
+
+    //Este método indica a chatroomsRef que escuche los cambios en /chatrooms
+    chatroomsRef.on("value", (snapshot) => {
+      const cs = this.getState();
+      const valor = snapshot.val();
+      const currentGame = lodash.map(valor.currentGame);
+      console.log(currentGame);
+      console.log("lo anterior es lo de la rtdb");
+      cs.rtdbData = currentGame;
+      this.saveData(cs);
+      if (currentGame.length == 2 || currentGame.length > 2) {
+        console.log("Tu usuario no coincide con uno de la lista");
+      } else {
+        console.log(currentGame.length);
+        console.log("Todavia hay espacio");
+      }
+    });
+  },
+  saveData(rtdbData) {
+    this.setState(rtdbData);
+  },
+
+  auth(email, userName) {
+    console.log("soy el state");
+    const raw = JSON.stringify({ email, userName });
+    fetch("/auth", {
+      method: "POST",
+      body: raw,
+      headers: { "content-type": "application/json" },
+    })
+      .then((data) => data.json())
+      .then((jsonData) => {
+        if (jsonData.id && jsonData.userName) {
+          const cs = this.getState();
+          cs.me.userName = jsonData.userName;
+          cs.me.userId = jsonData.id;
+          this.saveData(cs);
+          Router.go("/inicio-game");
+        } else {
+          alert(jsonData.message);
+        }
+      });
+  },
+  newRoom() {
+    const cs = this.getState();
+    const { userId, userName } = cs.me;
+
+    const raw = JSON.stringify({ userId, userName });
+    fetch("/rooms", {
+      method: "POST",
+      body: raw,
+      headers: { "content-type": "application/json" },
+    })
+      .then((res) => res.json())
+      .then((resJson) => {
+        console.log(resJson);
+        if (resJson.id ? true : false) {
+          console.log(resJson.id, "estoy entrando con esto a joinRoom");
+          this.joinRoom(resJson.id);
+        } else {
+          alert("hubo un problema creando la sala");
+        }
+      });
+  },
+  joinRoom(id) {
+    const cs = this.getState();
+    const userId = cs.me.userId;
+    fetch("/room/" + id + `?userId=${userId}`, {
+      method: "GET",
+    })
+      .then((res) => res.json())
+      .then((resJson) => {
+        if (resJson.roomLongId ? true : false) {
+          const realRoomId = resJson.roomLongId;
+          fetch("/rooms/" + realRoomId + `?userId=${userId}`, {
+            method: "POST",
+          })
+            .then((res) => res.json())
+            .then((resJson) => {
+              console.log(resJson);
+            });
+        } else {
+          alert(resJson.message);
+        }
+      });
   },
 };
 
