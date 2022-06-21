@@ -3,13 +3,13 @@ import * as express from "express";
 import { db, rtdb } from "./db";
 import { v4 as uuidv4 } from "uuid";
 // import * as cors from "cors";
-
+const port = process.env.PORT || 3000;
 const app = express();
 // const port = process.env.PORT;
 app.use(express.json());
 // app.use(cors());
 
-const usersCollection = db.collection("milaneso");
+const usersCollection = db.collection("users");
 const roomsCollection = db.collection("rooms");
 
 //Permite hostear el index.html del front (por eso refiere a dist como objetivo)
@@ -46,7 +46,7 @@ app.post("/signup", (req, res) => {
 
 //Loguearse, en ese caso solo con el email
 app.post("/auth", (req, res) => {
-  const { email } = req.body;
+  const { email, userName } = req.body;
   usersCollection
     .where("email", "==", email)
     .get()
@@ -54,9 +54,14 @@ app.post("/auth", (req, res) => {
       //si no existe el usuario hace esto
       if (searchResponse.empty) {
         res.status(404).json({ message: "Not found" });
+      } else if (searchResponse.docs[0].data().nombre != userName) {
+        console.log(searchResponse.docs[0].data().nombre);
+        console.log(userName);
+        res.status(404).json({ message: "Bad Username" });
       } else {
         res.json({
           id: searchResponse.docs[0].id,
+          userName: searchResponse.docs[0].data().nombre,
         });
       }
     });
@@ -64,16 +69,23 @@ app.post("/auth", (req, res) => {
 
 //crear una sala
 app.post("/rooms", (req, res) => {
-  const { userId } = req.body;
+  const { userId, userName } = req.body;
   usersCollection
     .doc(userId.toString())
     .get()
     .then((doc) => {
-      if (doc.exists) {
+      if (doc.exists && userName != "") {
         const roomRef = rtdb.ref("rooms/" + uuidv4());
         roomRef
           .set({
-            messages: [],
+            currentGame: {
+              [userId]: {
+                player: userName,
+                choice: "",
+                online: true,
+                start: false,
+              },
+            },
             owner: userId,
           })
           .then(() => {
@@ -124,21 +136,118 @@ app.get("/room/:id", (req, res) => {
     });
 });
 
-//Con este post se envian mensajes a una sala específica
+//Con este post se crea un "jugador" en una room especifica
+//Este EndPoint solicita el userId como query param, un roomId como paraámetro este debe ser el roomIdReal el cual deberia estar guardado en el state
 app.post("/rooms/:roomId", function (req, res) {
-  const id = uuidv4();
-  const fecha = Date.now();
+  const { userId } = req.query;
+  // const id = uuidv4();
+  // const fecha = Date.now();
+  // const user = req.body.user;
 
-  rtdb
-    .ref("/rooms/" + req.params.roomId + "/" + id)
-    .set({ msg: req.body.msg, user: req.body.user, date: fecha }, function () {
-      res.json({ id, result: "mensaje enviado" });
+  //Esto corrobora que le enviemos el queryParam userId
+  usersCollection
+    .doc(userId.toString())
+    .get()
+    .then((doc) => {
+      if (doc.exists) {
+        const userName = doc.data().nombre;
+        rtdb
+          .ref("rooms/" + req.params.roomId + "/currentGame")
+          .get()
+          .then((snap) => {
+            if (snap.val()[userId.toString()]) {
+              rtdb
+                .ref("rooms/" + req.params.roomId + "/currentGame/" + userId)
+                .set({
+                  player: userName,
+                  choice: "",
+                  online: true,
+                  start: false,
+                })
+                .then(() => {
+                  res.json({
+                    message:
+                      "Player 1, creador de la sala. Este jugador no es sustituible",
+                  });
+                });
+            } else if (
+              snap.val().player2?.player == userName ||
+              !snap.val().player2
+            ) {
+              const userName = doc.data().nombre;
+              //aca lo que hacemos es crear los datos de juego con el userId para que nunca se repita, todo dentro de currentGame
+              rtdb
+                .ref("/rooms/" + req.params.roomId + "/currentGame/player2")
+                .set(
+                  {
+                    player: userName,
+                    choice: "",
+                    online: true,
+                    start: false,
+                    // date: fecha,
+                  },
+                  function () {
+                    res.json({ result: "Hola jugador 2" });
+                  }
+                );
+
+              console.log("Jugador actualizado");
+            } else {
+              res.status(404).json({
+                message:
+                  "Tu usuario existe, pero tu nombre no coincide con ninguno de los participantes registrados",
+              });
+            }
+          });
+      } else {
+        res.json({ message: "Necesito que me envies un usuario valido" });
+      }
     });
 
-  console.log("Mensaje enviado");
+  //este parametro roomId se refiere al verdadero ID el cual se adquiere con el EndPoint GetRealRoomId
+});
+
+//Elegir Jugada. Requiere el realRoomId, el userId como query param, la jugada y el userName en el body.
+app.post("/rooms/:roomId/choice-play/", (req, res) => {
+  const { userId } = req.query;
+  const { jugada, userName } = req.body;
+  usersCollection
+    .doc(userId.toString())
+    .get()
+    .then((doc) => {
+      if (doc.exists) {
+        rtdb
+          .ref("rooms/" + req.params.roomId + "/currentGame")
+          .get()
+          .then((snap) => {
+            if (snap.val()[userId.toString()]) {
+              rtdb
+                .ref("rooms/" + req.params.roomId + "/currentGame/" + userId)
+                .update({ choice: jugada })
+                .then(() => {
+                  res.json({ message: "jugado jugador 1" });
+                });
+            } else if (snap.val().player2.player == userName) {
+              rtdb
+                .ref("rooms/" + req.params.roomId + "/currentGame/player2")
+                .update({ choice: jugada })
+                .then(() => {
+                  res.json({ message: "jugado jugador 2" });
+                });
+            } else {
+              res.json({
+                message:
+                  "Tu usuario existe, pero tu nombre no coincide con ninguno de los participantes",
+              });
+            }
+          });
+      } else {
+        res.json({ message: "este usuario no existe" });
+      }
+    });
 });
 
 //Escuchar en el puerto indicado
-app.listen(process.env.PORT || 3000, () => {
-  console.log("Escuchando en puerto", process.env.PORT || 3000);
+app.listen(port, () => {
+  console.log("Escuchando en puerto", port);
 });
