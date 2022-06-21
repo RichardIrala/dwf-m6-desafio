@@ -8,12 +8,15 @@ import "./rtdb";
 
 import { state } from "./state";
 (function () {
-  const root = document.querySelector(".root");
+  // const root = document.querySelector(".root");
   state.init();
-  localStorage.setItem("mod6-desafio", JSON.stringify(state.getState()));
+  sessionStorage.setItem("mod6-desafio", JSON.stringify(state.getState()));
   state.subscribe(() => {
-    localStorage.setItem("mod6-desafio", JSON.stringify(state.getState()));
+    sessionStorage.setItem("mod6-desafio", JSON.stringify(state.getState()));
   });
-
-  window.onpopstate = function () {};
+  console.log("Holis");
+  //Esto me sirve para dsp hacer la version (join Room)
+  // state.setRoomRef("10302f94-f538-4e8f-935f-2fffcb9edc9f").then(() => {
+  //   state.listenDatabase();
+  // });
 })();
