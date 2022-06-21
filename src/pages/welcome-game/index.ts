@@ -1,4 +1,5 @@
 import { Router } from "@vaadin/router";
+import { state } from "../../state";
 
 const fondoDelJuego = require("url:../../components/imgs/fondo.svg");
 //SEGUIR CON ESTA PAGINA, HACER QUE ESTA PAGINA SE TRANSFORME ENTRE ENTRAR A UN ROOM Y CREAR ROOM
@@ -103,9 +104,9 @@ customElements.define(
             e.target["my-email"].value != ""
           ) {
             //My-name es el name del input del formulario
-            console.log(e.target["my-email"].value);
-            console.log(e.target["my-name"].value);
-            Router.go("/inicio-game");
+            const email = e.target["my-email"].value;
+            const userName = e.target["my-name"].value;
+            state.auth(email, userName);
           } else {
             //Alerta de que faltan casillas
             const formAlert = this.shadow.querySelectorAll(".display--none");
