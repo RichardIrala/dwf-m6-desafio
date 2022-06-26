@@ -220,7 +220,7 @@ customElements.define(
 
     .main-column__number { grid-area: number;  background: rgba(0, 144, 72,  1);}
     .main-column__titulo { grid-area: titulo;  background: rgba(0, 108, 252, 1);}
-        .main-column__C { grid-area: imagen;  background: rgba(0, 108, 252, 1); flex-direction: column; padding: 20px; gap: 20px;}
+        .main-column__C { grid-area: imagen;   background: rgba(0, 108, 252, 1); flex-direction: column; padding: 20px; gap: 20px;}
   `;
       divPadre.appendChild(style);
     }
@@ -231,6 +231,7 @@ customElements.define(
           e.preventDefault();
           const valorDelForm = e.target["headerForm"].value;
           if (valorDelForm == "contactarme") {
+            Router.go("/play-game");
             console.log("CONTACTADOWEY");
           } else if (valorDelForm == "jugar") {
             Router.go("/welcome-game");
