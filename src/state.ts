@@ -7,9 +7,12 @@ const papel = require("url:./components/imgs/papel.svg");
 const tijera = require("url:./components/imgs/tijera.svg");
 const state = {
   data: {
+    resultRender: "",
+    shortRoomId: "",
     roomRef: "",
     rtdbData: {},
     me: {},
+    scores: { me: "", enemy: "" },
     game: {
       play: {
         myPlay: "",
@@ -21,6 +24,9 @@ const state = {
       },
       listeners: [],
     },
+    myPlayerNumber: "",
+    enemyPlayerNumber: "",
+    enemyName: "",
   },
   listeners: [],
 
@@ -94,20 +100,28 @@ const state = {
     this.setState(cs);
     //Aca no necesito hacer el setState porque setJugada ya lo hace. Y ambas van de la mano
   },
-  addPuntos(pointForWho: "pc" | "player") {
+  addPuntos() {
+    //CHEQUEAR ESTE METODO 26/06/2022
+    //El juego ya esta casi finalizado, solo falta esto y luego limpiar código viejo. Y ordenar el código + optimizar lo que se pueda para mejor lectura y compresión de otros devs
+    const cs = state.getState();
+    const realRoomId = cs.roomRef;
+    const userId = cs.me.userId;
+    const userName = cs.me.userName;
+    const raw = JSON.stringify({ userName });
+    fetch(`/rooms/${realRoomId}/addScore?userId=${userId}`, {
+      method: "POST",
+      body: raw,
+      headers: { "content-type": "application/json" },
+    });
+  },
+  setRenderResultsOnChange(callback) {
     const cs = this.getState();
-    const gameStatus = cs.game.gamesStatus;
-    if (pointForWho == "player") {
-      gameStatus.victorys = gameStatus.victorys + 1;
-      console.log(cs, "RESULTADO DE LAS VICTORIAS CS");
-      this.setState(cs);
-    } else if (pointForWho == "pc") {
-      gameStatus.losses = gameStatus.losses + 1;
-      console.log(cs, "RESULTADO DE LAS DERROTAS CS");
-      this.setState(cs);
-    } else {
-      alert("error");
-    }
+    cs.resultRender = callback;
+    this.saveData(cs);
+  },
+  renderResultsOnChange() {
+    const cs = this.getState();
+    cs.resultRender();
   },
 
   renderAnimationCombat() {
@@ -169,129 +183,212 @@ const state = {
       }
     }
     `;
-    const jugadas = this.getState().game.play;
+    const jugadas = this.getState().rtdbData;
+    const miPlayerNumber = Number(this.getState().myPlayerNumber - 1);
+    const enemyPlayerNumber = Number(this.getState().enemyPlayerNumber) - 1;
     function pcPlay() {
-      if (jugadas.computerPlay == "piedra") {
+      if (jugadas[enemyPlayerNumber].choice == "piedra") {
         return piedra;
-      } else if (jugadas.computerPlay == "papel") {
+      } else if (jugadas[enemyPlayerNumber].choice == "papel") {
         return papel;
-      } else {
+      } else if (jugadas[enemyPlayerNumber].choice == "tijera") {
         return tijera;
       }
     }
     function playerPlay() {
-      if (jugadas.myPlay == "piedra") {
+      if (jugadas[miPlayerNumber].choice == "piedra") {
         return piedra;
-      } else if (jugadas.myPlay == "papel") {
+      } else if (jugadas[miPlayerNumber].choice == "papel") {
         return papel;
-      } else {
+      } else if (jugadas[enemyPlayerNumber].choice == "tijera") {
         return tijera;
       }
     }
+    const pcPlayImage = pcPlay();
+    const playerPlayImage = playerPlay();
     // console.log(jugadas, "sSOMOSMOSMOS");
-    jugadas.myPlay != ""
-      ? (root.innerHTML = `
-      <img class="pc-play-now" src=${pcPlay()}>
-      <img class="pc-play-fast" src=${pcPlay()}>
-      <img class="player-play-now" src=${playerPlay()}>
-      <img class="player-play-fast" src=${playerPlay()}>
-      `)
-      : (root.innerHTML = `NO JUGASTE BRO`);
+    if (
+      jugadas[enemyPlayerNumber].choice != "" &&
+      jugadas[miPlayerNumber].choice != ""
+    ) {
+      root.innerHTML = `
+    <img class="pc-play-now" src=${pcPlayImage}>
+    <img class="pc-play-fast" src=${pcPlayImage}>
+    <img class="player-play-now" src=${playerPlayImage}>
+    <img class="player-play-fast" src=${playerPlayImage}>
+    `;
+    } else {
+      root.innerHTML = `NO JUGO alguno de ustedes BRO`;
+    }
+
     root.appendChild(style);
   },
 
   renderGanador() {
-    // for (const cb of this.listener) {
-    //   cb();
-    // }
     const root = document.querySelector(".root");
     root.innerHTML = ``;
     //
-    const jugadas = this.getState().game.play;
+    const jugadas = this.getState().rtdbData;
+    const myPlayerNumber = Number(this.getState().myPlayerNumber - 1);
+    const enemyPlayerNumber = Number(this.getState().enemyPlayerNumber) - 1;
     const victoriaConPiedra = [
-      jugadas.myPlay == "piedra" && jugadas.computerPlay == "tijera",
+      jugadas[myPlayerNumber].choice == "piedra" &&
+        jugadas[enemyPlayerNumber].choice == "tijera",
     ];
 
     const victoriaConPapel = [
-      jugadas.myPlay == "papel" && jugadas.computerPlay == "piedra",
+      jugadas[myPlayerNumber].choice == "papel" &&
+        jugadas[enemyPlayerNumber].choice == "piedra",
     ];
     const victoriaConTijera = [
-      jugadas.myPlay == "tijera" && jugadas.computerPlay == "papel",
+      jugadas[myPlayerNumber].choice == "tijera" &&
+        jugadas[enemyPlayerNumber].choice == "papel",
     ];
     const victoria = [victoriaConPiedra, victoriaConPapel, victoriaConTijera]
       .toString()
       .includes("true");
     //
     const empateConPiedra = [
-      jugadas.myPlay == "piedra" && jugadas.computerPlay == "piedra",
+      jugadas[myPlayerNumber].choice == "piedra" &&
+        jugadas[enemyPlayerNumber].choice == "piedra",
     ];
     const empateConPapel = [
-      jugadas.myPlay == "papel" && jugadas.computerPlay == "papel",
+      jugadas[myPlayerNumber].choice == "papel" &&
+        jugadas[enemyPlayerNumber].choice == "papel",
     ];
     const empateConTijera = [
-      jugadas.myPlay == "tijera" && jugadas.computerPlay == "tijera",
+      jugadas[myPlayerNumber].choice == "tijera" &&
+        jugadas[enemyPlayerNumber].choice == "tijera",
     ];
     const empate = [empateConPapel, empateConPiedra, empateConTijera]
       .toString()
       .includes("true");
     //
     const derrotaConPiedra = [
-      jugadas.myPlay == "piedra" && jugadas.computerPlay == "papel",
+      jugadas[myPlayerNumber].choice == "piedra" &&
+        jugadas[enemyPlayerNumber].choice == "papel",
     ];
     const derrotaConPapel = [
-      jugadas.myPlay == "papel" && jugadas.computerPlay == "tijera",
+      jugadas[myPlayerNumber].choice == "papel" &&
+        jugadas[enemyPlayerNumber].choice == "tijera",
     ];
     const derrotaConTijera = [
-      jugadas.myPlay == "tijera" && jugadas.computerPlay == "piedra",
+      jugadas[myPlayerNumber].choice == "tijera" &&
+        jugadas[enemyPlayerNumber].choice == "piedra",
     ];
     const derrota = [derrotaConPiedra, derrotaConPapel, derrotaConTijera]
       .toString()
       .includes("true");
 
-    //Si no selecciono nada la jugada de la computadora va a ser = a undefined ("")
-    const computerActualPlay = state.getState().game.computerPlay;
     if (victoria.toString() == "true") {
       //ACA SE AGREGAN PUNTOS AL JUGADOR
-      this.addPuntos("player");
+      this.addPuntos();
       root.innerHTML = `<game-results>Ganaste</game-results>`;
     } else if (empate.toString() == "true") {
       root.innerHTML = `<game-results>Empate</game-results>`;
     } else if (derrota.toString() == "true") {
       //ACA SE AGREGAN PUNTOS A LA PC
-      this.addPuntos("pc");
+
       root.innerHTML = `<game-results>Perdiste</game-results>`;
     } else {
-      root.innerHTML = `<game-results>ELEGI ALGO</game-results>`;
+      root.innerHTML = `<game-results>ELEGI ALGOs</game-results>`;
     }
   },
   async setRoomRef(realRoomId) {
     //ID de room en la realtimeDB
-    this.data.roomRef = realRoomId;
+    const cs = this.getState();
+    cs.roomRef = realRoomId;
+    this.saveData(cs);
   },
   async listenDatabase() {
     // rtdbFrontEnd;
-    const chatroomsRef = rtdbFrontEnd.ref(`/rooms/${this.data.roomRef}`);
+    const currentGameRef = rtdbFrontEnd.ref(
+      `/rooms/${this.data.roomRef}/currentGame`
+    );
     // console.log(roomLongId);
 
-    //Este método indica a chatroomsRef que escuche los cambios en /chatrooms
-    chatroomsRef.on("value", (snapshot) => {
+    //Este método indica a currentGameRef que escuche los cambios en /currentGame
+    currentGameRef.on("value", (snapshot) => {
       const cs = this.getState();
       const valor = snapshot.val();
-      const currentGame = lodash.map(valor.currentGame);
+      const currentGame = lodash.map(valor);
       console.log(currentGame);
       console.log("lo anterior es lo de la rtdb");
       cs.rtdbData = currentGame;
       this.saveData(cs);
-      if (currentGame.length == 2 || currentGame.length > 2) {
-        console.log("Tu usuario no coincide con uno de la lista");
-      } else {
-        console.log(currentGame.length);
-        console.log("Todavia hay espacio");
+
+      const pathInicioGame = "/inicio-game";
+      const pathSalaDeEspera = "/waiting-players";
+      const pathDelJuego = "/game-instructions";
+      const pathActual = window.location.pathname;
+      const pathIngresarAUnaSala = "/ingresar-a-una-sala";
+      const pathDeEleccionDePPOT = "/play-game-online";
+      this.setEnemyName();
+
+      if (
+        currentGame[0].online == true &&
+        currentGame[1]?.online == true &&
+        (pathActual == pathIngresarAUnaSala || pathActual == pathSalaDeEspera)
+      ) {
+        //corregir problema
+        console.log("INGRESANDO AL JUEGO");
+        Router.go(pathDelJuego);
+      } else if (
+        pathActual != pathSalaDeEspera &&
+        pathActual != pathDelJuego &&
+        (pathActual == pathIngresarAUnaSala || pathActual == pathInicioGame)
+      ) {
+        console.log("INGRESANDO A UNA SALA DE ESPERA BRO");
+        Router.go(pathSalaDeEspera);
       }
+
+      if (
+        cs.rtdbData[0].start == true &&
+        cs.rtdbData[1].start == true &&
+        pathActual != pathDeEleccionDePPOT
+      ) {
+        Router.go(pathDeEleccionDePPOT);
+      }
+
+      // this.checkStartValues();
     });
+  },
+  async getPlayerPoints() {
+    const cs = this.getState();
+    const userName = cs.me.userName;
+    const enemyName = cs.enemyName;
+    const scoresRef = rtdbFrontEnd.ref(`/rooms/${this.data.roomRef}/scores`);
+    this.checkScoresInRealTime(scoresRef, userName, enemyName);
+    return { message: "Valores Agregados al STATE" };
+    // const puntosRetornados = scoresRef.get().then((snap) => {
+    //   const snapVal = snap.val();
+    //   const misPuntos = snapVal[userName];
+    //   const susPuntos = snapVal[enemyName];
+    //   const puntos = { me: misPuntos, enemy: susPuntos };
+    //   return puntos;
+    // });
+
+    // return puntosRetornados;
   },
   saveData(rtdbData) {
     this.setState(rtdbData);
+  },
+  //CHEQUEAR BIEN ESTE METODO
+  checkScoresInRealTime(ref, myName, enemyName) {
+    console.log(
+      "%cQUE PASA QUE NO FUNCIONO LRPTM; QUE LO RE MIL PAR",
+      "color: blue"
+    );
+    ref.on("value", (snapshot) => {
+      const snapVal = snapshot.val();
+      const cs = this.getState();
+
+      //RETORNADOR DE SCORES A ULTIMO MOMENTO.
+      cs.scores.me = snapVal[myName] ? snapVal[myName] : 0;
+      cs.scores.enemy = snapVal[enemyName] ? snapVal[enemyName] : 0;
+      this.saveData(cs);
+      this.renderResultsOnChange();
+    });
   },
 
   auth(email, userName) {
@@ -345,18 +442,132 @@ const state = {
       .then((res) => res.json())
       .then((resJson) => {
         if (resJson.roomLongId ? true : false) {
+          //ACA AGREGO EL DATA.ROOM porque se confirma la existencia de la room y con eso basta
+          this.setShortRoomId(id);
           const realRoomId = resJson.roomLongId;
           fetch("/rooms/" + realRoomId + `?userId=${userId}`, {
             method: "POST",
           })
             .then((res) => res.json())
             .then((resJson) => {
-              console.log(resJson);
+              console.log(
+                id,
+                "soy el ID de la sala luego de crear o querer ingresar a una sala, buenos dias :3"
+              );
+              if (resJson.player) {
+                cs.myPlayerNumber = resJson.player;
+                function setEnemyNumber(myPlayerNumber) {
+                  if (myPlayerNumber == 1) {
+                    return 2;
+                  } else if (myPlayerNumber == 2) {
+                    return 1;
+                  } else {
+                    alert(
+                      "Hay un problema para identificar qué jugador es cada uno"
+                    );
+                  }
+                }
+                cs.enemyPlayerNumber = setEnemyNumber(cs.myPlayerNumber);
+                console.log(cs.enemyPlayerNumber, "soy el enemigo");
+                this.setRoomRef(realRoomId);
+                this.listenDatabase();
+              }
             });
         } else {
           alert(resJson.message);
         }
       });
+  },
+  setEnemyName() {
+    const cs = this.getState();
+    cs.rtdbData.forEach((data) => {
+      if (data.player != cs.me.userName) {
+        cs.enemyName = data.player;
+      }
+    });
+
+    this.saveData(cs);
+  },
+  getPlayerNames() {
+    const cs = this.getState();
+    return { myName: cs.me.userName, enemyName: cs.enemyName };
+  },
+  getRtdbData() {
+    const cs = this.getState();
+    return cs.rtdbData;
+  },
+  checkStartValues(actualPathname) {
+    const rtdbData = this.getRtdbData();
+    if (actualPathname == "/game-instructions") {
+      checkValues();
+    }
+
+    function checkValues() {
+      if (rtdbData[0].start == true && rtdbData[1].start == true) {
+        console.log("Ambos son true");
+      } else {
+        console.log("Todavia no son los 2 true");
+      }
+    }
+  },
+  setReadyToPlay() {
+    const pathEsperandoAmbosStarts = "/waiting-confirm-to-start";
+    Router.go(pathEsperandoAmbosStarts);
+    const cs = this.getState();
+    fetch(`/rooms/${cs.roomRef}/set-start?userId=${cs.me.userId}`, {
+      method: "post",
+    })
+      .then((res) => res.json())
+      .then((resJson) => {
+        console.log(resJson);
+      });
+  },
+  setMyPlayOnline(jugada: number) {
+    const cs = this.getState();
+    cs.game.play.myPlay = "";
+    var myPlay;
+    if (jugada == 0) {
+      myPlay = "piedra";
+    } else if (jugada == 1) {
+      myPlay = "papel";
+    } else if (jugada == 2) {
+      myPlay = "tijera";
+    }
+    const userId = cs.me.userId;
+    const roomLongId = cs.roomRef;
+    const raw = JSON.stringify({ jugada: myPlay, userName: cs.me.userName });
+    // console.log(raw);
+    fetch(`/rooms/${roomLongId}/choice-play?userId=${userId}`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: raw,
+    })
+      .then((res) => res.json())
+      .then((resJson) => {
+        console.log(resJson, "soy el resultado de elegir una jugada.");
+      });
+  },
+  renderAnimationCombatOnline() {},
+  setMyEmptyPlayOnline() {
+    const cs = this.getState();
+    const userId = cs.me.userId;
+    const roomLongId = cs.roomRef;
+    const raw = JSON.stringify({ jugada: "", userName: cs.me.userName });
+    // console.log(raw);
+    fetch(`/rooms/${roomLongId}/choice-play?userId=${userId}`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: raw,
+    });
+  },
+  setShortRoomId(id) {
+    const cs = this.getState();
+    cs.shortRoomId = id;
+    this.saveData(cs);
+  },
+  getShortRoomId() {
+    const cs = this.getState();
+    return cs.shortRoomId;
   },
 };
 
