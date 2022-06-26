@@ -168,6 +168,7 @@ app.post("/rooms/:roomId", function (req, res) {
                   res.json({
                     message:
                       "Player 1, creador de la sala. Este jugador no es sustituible",
+                    player: 1,
                   });
                 });
             } else if (
@@ -187,7 +188,7 @@ app.post("/rooms/:roomId", function (req, res) {
                     // date: fecha,
                   },
                   function () {
-                    res.json({ result: "Hola jugador 2" });
+                    res.json({ message: "Hola jugador 2", player: 2 });
                   }
                 );
 
@@ -247,6 +248,75 @@ app.post("/rooms/:roomId/choice-play/", (req, res) => {
     });
 });
 
+app.post("/rooms/:roomId/set-start", (req, res) => {
+  const { roomId } = req.params;
+  const { userId } = req.query;
+  usersCollection
+    .doc(userId.toString())
+    .get()
+    .then((doc) => {
+      if (doc.exists) {
+        const sala = rtdb.ref("/rooms/" + roomId + "/currentGame");
+        sala.get().then((snap) => {
+          const valor = snap.val();
+          if (valor[userId.toString()]) {
+            //Corrobora si sos el player 1
+            const player1Ref = rtdb.ref(
+              "/rooms/" + roomId + "/currentGame/" + userId.toString()
+            );
+            player1Ref.update({ start: true });
+            res.json({ message: "Hola player 1. Estamos listos :D" });
+          } else if (doc.data().nombre == "mica2") {
+            //corrobora si sos el player 2, comparandote con el nombre del jugador 2
+            const player2Ref = rtdb.ref(
+              "/rooms/" + roomId + "/currentGame/player2"
+            );
+            player2Ref.update({ start: true });
+            res.json({ message: "Hola player 2. Estamos listos :D" });
+          } else {
+            //dado el caso de que tu usuario si exista, pero no seas ninguno de los participantes te da un 404 not found
+            res.status(404).json({
+              message: "Usted no coincide con ninguno de los participantes",
+            });
+          }
+        });
+      } else {
+        //Este usuario no existe.
+        res.status(404).json({ message: "Este usuario no existe" });
+      }
+    });
+});
+app.post("/rooms/:roomId/addScore", (req, res) => {
+  const { roomId } = req.params;
+  const { userName } = req.body;
+  const { userId } = req.query;
+  usersCollection
+    .doc(userId.toString())
+    .get()
+    .then((doc) => {
+      if (doc.exists) {
+        const scoresRef = rtdb.ref(`/rooms/${roomId}/scores`);
+        scoresRef.get().then((snap) => {
+          const valores = snap.val();
+          if (valores[userName]) {
+            scoresRef
+              .update({
+                [userName]: valores[userName] + 1,
+              })
+              .then(() => {
+                res.json({ message: "UPDATEADO XD" });
+              });
+          } else {
+            scoresRef.update({ [userName]: 1 }).then(() => {
+              res.json({ message: "No existia pero ahora chi" });
+            });
+          }
+        });
+      } else {
+        res.json({ message: "Not Found" });
+      }
+    });
+});
 //Escuchar en el puerto indicado
 app.listen(port, () => {
   console.log("Escuchando en puerto", port);
