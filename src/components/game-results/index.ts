@@ -82,8 +82,10 @@ customElements.define(
     }
     render() {
       const cs = state.getState();
-      const victorias = cs.game.gamesStatus.victorys;
-      const derrotas = cs.game.gamesStatus.losses;
+      const myName = cs.me.userName;
+      const enemyName = cs.enemyName;
+      const victorias = cs.scores.me;
+      const derrotas = cs.scores.enemy;
       const div = document.createElement("div");
       div.classList.add("all-content-container");
       div.innerHTML = `
@@ -92,8 +94,8 @@ customElements.define(
       </div>
       <div class="game-results__status">
         <span class="game-results__status-text">Score:</span>
-        <span class="game-results__status-text">Victorias: ${victorias}</span>
-        <span class="game-results__status-text">Derrotas: ${derrotas}</span>
+        <span class="game-results__status-text">${myName}: ${victorias}</span>
+        <span class="game-results__status-text">${enemyName}: ${derrotas}</span>
       </div>
       <div class="game-results__volver-a-jugar">
         <game-button-blue class="button-volver-a-jugar">Volver a Jugar</game-button-blue>
