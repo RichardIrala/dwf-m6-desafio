@@ -1,12 +1,12 @@
 import { Router } from "@vaadin/router";
 // import "./pages/inicioGame";
-import "./pages/game-instructions";
-import "./pages/play-game";
 import "./pages/welcome";
+import "./pages/play-game";
+import "./pages/join-room";
 //este es el game-element
 import "./pages/inicio-game-el";
 import "./pages/welcome-game";
-import "./pages/join-room";
+import "./pages/game-instructions";
 import "./pages/waiting-players";
 import "./pages/waiting-confirm-to-start";
 import "./pages/play-game-online";
