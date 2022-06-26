@@ -1,5 +1,4 @@
-import { pageWelcome } from "../../pages/welcome";
-
+import { Router } from "@vaadin/router";
 const homepageIcon = require("url:../imgs/homepage.svg");
 customElements.define(
   "homepage-icon",
@@ -57,14 +56,7 @@ customElements.define(
       this.shadow
         .querySelector(".homepage-icon")
         .addEventListener("click", () => {
-          const BASE_PATH = "/desafio-m5";
-          function isGithubPages() {
-            return location.host.includes("github.io");
-          }
-          //Esto es un router manual que edita la URL y te recarga la página en el inicio
-          const completePath = isGithubPages() ? BASE_PATH + "/" : "/";
-          history.pushState({}, "", completePath);
-          location.reload();
+          Router.go("/");
         });
     }
   }
