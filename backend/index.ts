@@ -298,17 +298,25 @@ app.post("/rooms/:roomId/addScore", (req, res) => {
         const scoresRef = rtdb.ref(`/rooms/${roomId}/scores`);
         scoresRef.get().then((snap) => {
           const valores = snap.val();
-          if (valores[userName]) {
-            scoresRef
-              .update({
-                [userName]: valores[userName] + 1,
-              })
-              .then(() => {
-                res.json({ message: "UPDATEADO XD" });
+          console.log(valores);
+          if (valores) {
+            if (valores[userName]) {
+              scoresRef
+                .update({
+                  [userName]: valores[userName] + 1,
+                })
+                .then(() => {
+                  res.json({ message: "UPDATEADO XD" });
+                });
+            } else {
+              scoresRef.update({ [userName]: 1 }).then(() => {
+                res.json({ message: "No existia pero ahora chi" });
               });
+            }
           } else {
-            scoresRef.update({ [userName]: 1 }).then(() => {
-              res.json({ message: "No existia pero ahora chi" });
+            scoresRef.set({ [userName]: 1 }).then(() => {
+              console.log("tabla de scores creada");
+              res.json({ message: "Tabla de scores creada." });
             });
           }
         });
