@@ -57,11 +57,20 @@ customElements.define(
 
     addEventsInPpot() {
       const ppotEls = this.shadow.querySelectorAll(".ppot");
+
       ppotEls.forEach((e, eIndex) => {
         e.addEventListener("click", () => {
-          //Este evento se lanza cuando elige el jugador una de las 3 opciones del juego P-P o tijera(T)
-          state.setJugada(eIndex);
-          state.computerSetJugada(Math.floor(Math.random() * 3));
+          const pathActual = location.pathname;
+          const pathDelJuegoOnline = "/play-game-online";
+          console.log(pathActual, "soy el path actual brother xd");
+          if (pathActual == pathDelJuegoOnline) {
+            //Aca va el endpoint de choice play
+            console.log("FUNCIONOOOO");
+            state.setMyPlayOnline(eIndex);
+          }
+          // //Este evento se lanza cuando elige el jugador una de las 3 opciones del juego P-P o tijera(T)
+          // state.setJugada(eIndex);
+          // state.computerSetJugada(Math.floor(Math.random() * 3));
         });
       });
     }
