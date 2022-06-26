@@ -8,6 +8,35 @@ customElements.define(
     constructor() {
       super();
       this.render();
+      state.setRenderResultsOnChange(() => {
+        this.render();
+      });
+    }
+    render() {
+      this.shadow.innerHTML = ``;
+      const cs = state.getState();
+      const myName = cs.me.userName;
+      const enemyName = cs.enemyName;
+      const victorias = cs.scores.me;
+      const derrotas = cs.scores.enemy;
+      const div = document.createElement("div");
+      div.classList.add("all-content-container");
+      div.innerHTML = `
+      <div class="game-results__result-container">
+        <span class="game-results__result">${this.textContent}</span>
+      </div>
+      <div class="game-results__status">
+        <span class="game-results__status-text">Score:</span>
+        <span class="game-results__status-text">${myName}: ${victorias}</span>
+        <span class="game-results__status-text">${enemyName}: ${derrotas}</span>
+      </div>
+      <div class="game-results__volver-a-jugar">
+        <game-button-blue class="button-volver-a-jugar">Volver a Jugar</game-button-blue>
+      </div>
+      <homepage-icon></homepage-icon>
+      `;
+      this.shadow.appendChild(div);
+      //
       const style = document.createElement("style");
       //USAR CONSTANTES PARA LOS COLORES
       style.innerHTML = `
@@ -79,30 +108,6 @@ customElements.define(
       `;
       this.shadow.appendChild(style);
       this.eventosAgregados();
-    }
-    render() {
-      const cs = state.getState();
-      const myName = cs.me.userName;
-      const enemyName = cs.enemyName;
-      const victorias = cs.scores.me;
-      const derrotas = cs.scores.enemy;
-      const div = document.createElement("div");
-      div.classList.add("all-content-container");
-      div.innerHTML = `
-      <div class="game-results__result-container">
-        <span class="game-results__result">${this.textContent}</span>
-      </div>
-      <div class="game-results__status">
-        <span class="game-results__status-text">Score:</span>
-        <span class="game-results__status-text">${myName}: ${victorias}</span>
-        <span class="game-results__status-text">${enemyName}: ${derrotas}</span>
-      </div>
-      <div class="game-results__volver-a-jugar">
-        <game-button-blue class="button-volver-a-jugar">Volver a Jugar</game-button-blue>
-      </div>
-      <homepage-icon></homepage-icon>
-      `;
-      this.shadow.appendChild(div);
     }
     eventosAgregados() {
       this.shadow
