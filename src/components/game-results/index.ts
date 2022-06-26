@@ -27,8 +27,8 @@ customElements.define(
       </div>
       <div class="game-results__status">
         <span class="game-results__status-text">Score:</span>
-        <span class="game-results__status-text">${myName}: ${victorias}</span>
-        <span class="game-results__status-text">${enemyName}: ${derrotas}</span>
+        <span class="game-results__status-text">${myName}: ${victorias || 0 }</span>
+        <span class="game-results__status-text">${enemyName}: ${derrotas || 0}</span>
       </div>
       <div class="game-results__volver-a-jugar">
         <game-button-blue class="button-volver-a-jugar">Volver a Jugar</game-button-blue>
