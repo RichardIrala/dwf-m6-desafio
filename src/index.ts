@@ -5,6 +5,7 @@ import "./components/PPoT/index.ts";
 import "./components/game-results/index.ts";
 import "./components/homepage-icon/index.ts";
 import "./components/header-in-game";
+import "./components/alguien-no-eligio";
 import "./rtdb";
 
 import { state } from "./state";
