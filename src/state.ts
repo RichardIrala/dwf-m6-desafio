@@ -2,9 +2,9 @@ import { rtdbFrontEnd } from "./rtdb";
 import lodash from "lodash";
 import { Router } from "@vaadin/router";
 
+const tijera = require("url:./components/imgs/tijera.svg");
 const piedra = require("url:./components/imgs/piedra.svg");
 const papel = require("url:./components/imgs/papel.svg");
-const tijera = require("url:./components/imgs/tijera.svg");
 const state = {
   data: {
     resultRender: "",
@@ -13,26 +13,12 @@ const state = {
     rtdbData: {},
     me: {},
     scores: { me: "", enemy: "" },
-    game: {
-      play: {
-        myPlay: "",
-        computerPlay: "",
-      },
-      gamesStatus: {
-        victorys: 0,
-        losses: 0,
-      },
-      listeners: [],
-    },
     myPlayerNumber: "",
     enemyPlayerNumber: "",
     enemyName: "",
   },
   listeners: [],
 
-  consola() {
-    console.log(state.data.game.play);
-  },
   init() {
     // Busco data existente en el sessionStorage
     const localData = JSON.parse(sessionStorage.getItem("mod6-desafio"));
@@ -61,45 +47,6 @@ const state = {
     this.listeners.push(callback);
   },
 
-  //A partir de aca estan todos los comandos del state para el juego
-  resetJugadas() {
-    // console.log("DHSAJDGHSAJ");
-    const cs = this.getState();
-    cs.game.play.myPlay = "";
-    cs.game.play.computerPlay = "";
-    console.log(cs);
-    this.setState(cs);
-  },
-  setJugada(jugada: number) {
-    const cs = this.getState();
-    cs.game.play.computerPlay = "";
-    cs.game.play.myPlay = "";
-    var myPlay;
-    if (jugada == 0) {
-      myPlay = "piedra";
-    } else if (jugada == 1) {
-      myPlay = "papel";
-    } else if (jugada == 2) {
-      myPlay = "tijera";
-    }
-    cs.game.play.myPlay = myPlay;
-    this.setState(cs);
-  },
-
-  computerSetJugada(jugada: number) {
-    const cs = this.getState();
-    var computerPlay;
-    if (jugada == 0) {
-      computerPlay = "piedra";
-    } else if (jugada == 1) {
-      computerPlay = "papel";
-    } else if (jugada == 2) {
-      computerPlay = "tijera";
-    }
-    cs.game.play.computerPlay = computerPlay;
-    this.setState(cs);
-    //Aca no necesito hacer el setState porque setJugada ya lo hace. Y ambas van de la mano
-  },
   addPuntos() {
     //CHEQUEAR ESTE METODO 26/06/2022
     //El juego ya esta casi finalizado, solo falta esto y luego limpiar código viejo. Y ordenar el código + optimizar lo que se pueda para mejor lectura y compresión de otros devs
@@ -128,6 +75,15 @@ const state = {
     const root = document.querySelector(".root");
     const style = document.createElement("style");
     style.innerHTML = `
+    * {
+      margin: 0;
+      box-sizing: border-box;
+    }
+    .container-animation-combat {
+      height: 100vh;
+      width: 100vh;
+      overflow: hidden;
+    }
     .pc-play-now {
       position: absolute;
       top: -10vh;
@@ -200,7 +156,7 @@ const state = {
         return piedra;
       } else if (jugadas[miPlayerNumber].choice == "papel") {
         return papel;
-      } else if (jugadas[enemyPlayerNumber].choice == "tijera") {
+      } else if (jugadas[miPlayerNumber].choice == "tijera") {
         return tijera;
       }
     }
@@ -212,13 +168,15 @@ const state = {
       jugadas[miPlayerNumber].choice != ""
     ) {
       root.innerHTML = `
-    <img class="pc-play-now" src=${pcPlayImage}>
-    <img class="pc-play-fast" src=${pcPlayImage}>
-    <img class="player-play-now" src=${playerPlayImage}>
-    <img class="player-play-fast" src=${playerPlayImage}>
+      <div class="container-animation-combat">
+        <img class="pc-play-now" src=${pcPlayImage}>
+        <img class="pc-play-fast" src=${pcPlayImage}>
+        <img class="player-play-now" src=${playerPlayImage}>
+        <img class="player-play-fast" src=${playerPlayImage}>
+      </div>
     `;
     } else {
-      root.innerHTML = `NO JUGO alguno de ustedes BRO`;
+      root.innerHTML = `<alguien-no-eligio-el></alguien-no-eligio>`;
     }
 
     root.appendChild(style);
@@ -281,17 +239,17 @@ const state = {
       .includes("true");
 
     if (victoria.toString() == "true") {
-      //ACA SE AGREGAN PUNTOS AL JUGADOR
+      //Si ganas, agregas un punto a tu score en la base de datos
       this.addPuntos();
       root.innerHTML = `<game-results>Ganaste</game-results>`;
     } else if (empate.toString() == "true") {
       root.innerHTML = `<game-results>Empate</game-results>`;
     } else if (derrota.toString() == "true") {
-      //ACA SE AGREGAN PUNTOS A LA PC
+      //En este caso perdiste.
 
       root.innerHTML = `<game-results>Perdiste</game-results>`;
     } else {
-      root.innerHTML = `<game-results>ELEGI ALGOs</game-results>`;
+      root.innerHTML = `<game-results>Uno de ustedes no eligio</game-results>`;
     }
   },
   async setRoomRef(realRoomId) {
@@ -450,29 +408,35 @@ const state = {
           })
             .then((res) => res.json())
             .then((resJson) => {
-              console.log(
-                id,
-                "soy el ID de la sala luego de crear o querer ingresar a una sala, buenos dias :3"
-              );
-              if (resJson.player) {
-                cs.myPlayerNumber = resJson.player;
-                function setEnemyNumber(myPlayerNumber) {
-                  if (myPlayerNumber == 1) {
-                    return 2;
-                  } else if (myPlayerNumber == 2) {
-                    return 1;
-                  } else {
-                    alert(
-                      "Hay un problema para identificar qué jugador es cada uno"
-                    );
+              //En este caso si la sala existe, se chequea si el jugador puede participar en la sala, en caso de no poder. Deberia existir resJson.notFound. Caso contrario el jugador ingresara a la sala
+              if (resJson.notFound) {
+                alert(resJson.notFound);
+              } else {
+                console.log(
+                  id,
+                  "soy el ID de la sala luego de crear o querer ingresar a una sala, buenos dias :3"
+                );
+
+                if (resJson.player) {
+                  cs.myPlayerNumber = resJson.player;
+                  function setEnemyNumber(myPlayerNumber) {
+                    if (myPlayerNumber == 1) {
+                      return 2;
+                    } else if (myPlayerNumber == 2) {
+                      return 1;
+                    } else {
+                      alert(
+                        "Hay un problema para identificar qué jugador es cada uno"
+                      );
+                    }
                   }
+                  cs.enemyPlayerNumber = setEnemyNumber(cs.myPlayerNumber);
+                  console.log(cs.enemyPlayerNumber, "soy el enemigo");
+                  this.setRoomRef(realRoomId);
+                  this.listenDatabase();
                 }
-                cs.enemyPlayerNumber = setEnemyNumber(cs.myPlayerNumber);
-                console.log(cs.enemyPlayerNumber, "soy el enemigo");
-                this.setRoomRef(realRoomId);
-                this.listenDatabase();
               }
-            });
+            }); /*Probando si catch toma como error un 404, en este caso del endpoint de seteo de estado en una sala */
         } else {
           alert(resJson.message);
         }
@@ -514,17 +478,31 @@ const state = {
     const pathEsperandoAmbosStarts = "/waiting-confirm-to-start";
     Router.go(pathEsperandoAmbosStarts);
     const cs = this.getState();
+    const raw = JSON.stringify({ userName: cs.me.userName, status: true });
     fetch(`/rooms/${cs.roomRef}/set-start?userId=${cs.me.userId}`, {
       method: "post",
+      headers: { "content-type": "application/json" },
+      body: raw,
     })
       .then((res) => res.json())
       .then((resJson) => {
         console.log(resJson);
       });
   },
+  async setStartFalse() {
+    const cs = this.getState();
+    const raw = JSON.stringify({ userName: cs.me.userName, status: false });
+    fetch(`/rooms/${cs.roomRef}/set-start?userId=${cs.me.userId}`, {
+      method: "post",
+      headers: { "content-type": "application/json" },
+      body: raw,
+    }).catch((err) => {
+      console.log(err);
+    });
+  },
   setMyPlayOnline(jugada: number) {
     const cs = this.getState();
-    cs.game.play.myPlay = "";
+
     var myPlay;
     if (jugada == 0) {
       myPlay = "piedra";
@@ -547,7 +525,7 @@ const state = {
         console.log(resJson, "soy el resultado de elegir una jugada.");
       });
   },
-  renderAnimationCombatOnline() {},
+
   setMyEmptyPlayOnline() {
     const cs = this.getState();
     const userId = cs.me.userId;
