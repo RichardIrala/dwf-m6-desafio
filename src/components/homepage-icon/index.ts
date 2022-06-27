@@ -56,6 +56,7 @@ customElements.define(
       this.shadow
         .querySelector(".homepage-icon")
         .addEventListener("click", () => {
+          document.querySelector(".root").innerHTML = ``;
           Router.go("/");
         });
     }
