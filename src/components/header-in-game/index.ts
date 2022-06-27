@@ -16,12 +16,17 @@ customElements.define(
       div.classList.add("size-gral-div");
       div.classList.add("grid-2c-centred");
 
+      const cs = state.getState();
+      const victorias = cs.scores.me;
+      const derrotas = cs.scores.enemy;
       div.innerHTML = /*html*/ `
         <div class="flex-row">
-            <span class="general-text">${playerNames.myName}: 0</span>
-            <span class="general-text orange">${
-              playerNames.enemyName
-            }: 10</span>
+            <span class="general-text">${playerNames.myName}: ${
+        victorias || 0
+      }</span>
+            <span class="general-text orange">${playerNames.enemyName}: ${
+        derrotas || 0
+      }</span>
         </div>
         <div class="flex-row">
             <span class="room">Sala</span>
