@@ -69,7 +69,6 @@ customElements.define(
       const divDelSpan = document.createElement("div");
       divDelSpan.classList.add("play-game__contador-container");
       div.appendChild(divDelSpan);
-      state.resetJugadas();
 
       const si = state.getPlayerPoints();
       console.log(si, "SOY LOS PUNTOS XD");
