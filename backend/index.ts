@@ -195,7 +195,7 @@ app.post("/rooms/:roomId", function (req, res) {
               console.log("Jugador actualizado");
             } else {
               res.status(404).json({
-                message:
+                notFound:
                   "Tu usuario existe, pero tu nombre no coincide con ninguno de los participantes registrados",
               });
             }
@@ -251,40 +251,48 @@ app.post("/rooms/:roomId/choice-play/", (req, res) => {
 app.post("/rooms/:roomId/set-start", (req, res) => {
   const { roomId } = req.params;
   const { userId } = req.query;
-  usersCollection
-    .doc(userId.toString())
-    .get()
-    .then((doc) => {
-      if (doc.exists) {
-        const sala = rtdb.ref("/rooms/" + roomId + "/currentGame");
-        sala.get().then((snap) => {
-          const valor = snap.val();
-          if (valor[userId.toString()]) {
-            //Corrobora si sos el player 1
-            const player1Ref = rtdb.ref(
-              "/rooms/" + roomId + "/currentGame/" + userId.toString()
-            );
-            player1Ref.update({ start: true });
-            res.json({ message: "Hola player 1. Estamos listos :D" });
-          } else if (doc.data().nombre == "mica2") {
-            //corrobora si sos el player 2, comparandote con el nombre del jugador 2
-            const player2Ref = rtdb.ref(
-              "/rooms/" + roomId + "/currentGame/player2"
-            );
-            player2Ref.update({ start: true });
-            res.json({ message: "Hola player 2. Estamos listos :D" });
-          } else {
-            //dado el caso de que tu usuario si exista, pero no seas ninguno de los participantes te da un 404 not found
-            res.status(404).json({
-              message: "Usted no coincide con ninguno de los participantes",
-            });
-          }
-        });
-      } else {
-        //Este usuario no existe.
-        res.status(404).json({ message: "Este usuario no existe" });
-      }
+  const { userName, status } = req.body;
+  if (userName && (status == true || status == false)) {
+    usersCollection
+      .doc(userId.toString())
+      .get()
+      .then((doc) => {
+        if (doc.exists) {
+          const sala = rtdb.ref("/rooms/" + roomId + "/currentGame");
+          sala.get().then((snap) => {
+            const valor = snap.val();
+            if (valor[userId.toString()]) {
+              //Corrobora si sos el player 1
+              const player1Ref = rtdb.ref(
+                "/rooms/" + roomId + "/currentGame/" + userId.toString()
+              );
+              player1Ref.update({ start: status });
+              res.json({ message: "Hola player 1. Estamos listos :D" });
+            } else if (doc.data().nombre == userName) {
+              //corrobora si sos el player 2, comparandote con el nombre del jugador 2
+              const player2Ref = rtdb.ref(
+                "/rooms/" + roomId + "/currentGame/player2"
+              );
+              player2Ref.update({ start: status });
+              res.json({ message: "Hola player 2. Estamos listos :D" });
+            } else {
+              //dado el caso de que tu usuario si exista, pero no seas ninguno de los participantes te da un 404 not found
+              res.status(404).json({
+                message: "Usted no coincide con ninguno de los participantes",
+              });
+            }
+          });
+        } else {
+          //Este usuario no existe.
+          res.status(404).json({ message: "Este usuario no existe" });
+        }
+      });
+  } else {
+    res.json({
+      message:
+        "En el body: status no es ni 'true' ni 'false'. O quiza no enviaste un userName.",
     });
+  }
 });
 app.post("/rooms/:roomId/addScore", (req, res) => {
   const { roomId } = req.params;
