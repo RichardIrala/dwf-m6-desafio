@@ -20,6 +20,7 @@ customElements.define(
       div.classList.add("principal-container");
 
       div.innerHTML = ` 
+        <homepage-icon></homepage-icon>
         <game-title></game-title>
         <form class="form-new-room">
             <label class="form-new-room__my-email--label">
@@ -37,23 +38,24 @@ customElements.define(
             <button class="submit-button" type="submit">
                 <game-button-blue class="ir-a">Empezar</game-button-blue>
             </button>
+            <span class="registrarse">¿No estás registrado? haz click aqui.</span>
         </form>
-        <homepage-icon></homepage-icon>
       `;
       style.innerHTML = `
         * { 
             box-sizing: border-box;
+            margin: 0;
         }
         .principal-container {
           background: url(${fondoDelJuego});
           background-size: cover;
-          height: 100vh;
+          min-height: 100vh;
           display: flex;
           flex-direction: column;
           align-items: center;
           gap: 74px;
           gap: 50px;
-          padding-top: 115px;
+          padding: 50px 0px;
         }
         .form-new-room {
             display: flex; 
@@ -90,6 +92,16 @@ customElements.define(
           color: red;
           font-size: 16px;
         }
+        .registrarse {
+          cursor: pointer;
+          font-size: 18px;
+          text-align: center;
+          font-weight: 600;
+        }
+        .registrarse:hover {
+          border: solid 1px;
+          background: rgba(0, 144, 72, 1);
+        }
       `;
       this.shadow.appendChild(div);
       this.shadow.appendChild(style);
@@ -116,6 +128,12 @@ customElements.define(
               }
             });
           }
+        });
+
+      this.shadow
+        .querySelector(".registrarse")
+        .addEventListener("click", () => {
+          Router.go("/signup");
         });
     }
   }
