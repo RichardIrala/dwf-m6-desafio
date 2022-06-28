@@ -42,7 +42,6 @@ const state = {
   },
 
   subscribe(callback: (any) => any) {
-    console.log("hecho");
     this.listeners.push(callback);
   },
 
@@ -263,8 +262,7 @@ const state = {
       const cs = this.getState();
       const valor = snapshot.val();
       const currentGame = lodash.map(valor);
-      console.log(currentGame);
-      console.log("lo anterior es lo de la rtdb");
+      // console.log(currentGame);
       cs.rtdbData = currentGame;
       this.saveData(cs);
 
@@ -314,15 +312,11 @@ const state = {
   },
 
   checkScoresInRealTime(ref, myName, enemyName) {
-    console.log(
-      "%cQUE PASA QUE NO FUNCIONO LRPTM; QUE LO RE MIL PAR",
-      "color: blue"
-    );
     ref.on("value", (snapshot) => {
       const snapVal = snapshot.val();
       const cs = this.getState();
 
-      //RETORNADOR DE SCORES A ULTIMO MOMENTO.
+      //RETORNADOR DE SCORES Real time.
       cs.scores.me = snapVal[myName] ? snapVal[myName] : 0;
       cs.scores.enemy = snapVal[enemyName] ? snapVal[enemyName] : 0;
       this.saveData(cs);
@@ -331,7 +325,6 @@ const state = {
   },
 
   auth(email, userName) {
-    console.log("soy el state");
     const raw = JSON.stringify({ email, userName });
     fetch("/auth", {
       method: "POST",
@@ -352,7 +345,6 @@ const state = {
       });
   },
   signup(email, nombre) {
-    console.log("soy el state");
     const raw = JSON.stringify({ email, nombre });
     fetch("/signup", {
       method: "POST",
@@ -384,9 +376,9 @@ const state = {
     })
       .then((res) => res.json())
       .then((resJson) => {
-        console.log(resJson);
+        // console.log(resJson);
         if (resJson.id ? true : false) {
-          console.log(resJson.id, "estoy entrando con esto a joinRoom");
+          // console.log(resJson.id, "estoy entrando con esto a joinRoom");
           this.joinRoom(resJson.id);
         } else {
           alert("hubo un problema creando la sala");
@@ -432,7 +424,6 @@ const state = {
                     }
                   }
                   cs.enemyPlayerNumber = setEnemyNumber(cs.myPlayerNumber);
-                  console.log(cs.enemyPlayerNumber, "soy el enemigo");
                   this.setRoomRef(realRoomId);
                   this.listenDatabase();
                 }
@@ -489,7 +480,7 @@ const state = {
     })
       .then((res) => res.json())
       .then((resJson) => {
-        console.log(resJson);
+        // console.log(resJson);
       });
   },
 
@@ -526,7 +517,7 @@ const state = {
     })
       .then((res) => res.json())
       .then((resJson) => {
-        console.log(resJson, "soy el resultado de elegir una jugada.");
+        // console.log(resJson, "soy el resultado de elegir una jugada.");
       });
   },
 
