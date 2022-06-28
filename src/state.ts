@@ -370,6 +370,26 @@ const state = {
         }
       });
   },
+  signup(email, nombre) {
+    console.log("soy el state");
+    const raw = JSON.stringify({ email, nombre });
+    fetch("/signup", {
+      method: "POST",
+      body: raw,
+      headers: { "content-type": "application/json" },
+    })
+      .then((data) => data.json())
+      .then((jsonData) => {
+        if (jsonData.new) {
+          Router.go("/welcome-game");
+          alert(
+            "Usuario registrado, por favor ahora ingrese con su nuevo usuario."
+          );
+        } else {
+          alert(jsonData.message);
+        }
+      });
+  },
   newRoom() {
     const cs = this.getState();
     const { userId, userName } = cs.me;
