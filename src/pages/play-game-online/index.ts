@@ -68,8 +68,7 @@ customElements.define(
       divDelSpan.classList.add("play-game__contador-container");
       div.appendChild(divDelSpan);
 
-      const si = state.getPlayerPoints();
-      console.log(si, "SOY LOS PUNTOS XD");
+      state.getPlayerPoints();
 
       const intervalId = setInterval(() => {
         divDelSpan.textContent = counter.toString();
