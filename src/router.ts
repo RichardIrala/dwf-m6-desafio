@@ -1,6 +1,5 @@
 import { Router } from "@vaadin/router";
 import "./pages/welcome";
-import "./pages/play-game";
 import "./pages/join-room";
 import "./pages/inicio-game-el";
 import "./pages/welcome-game";
@@ -23,6 +22,5 @@ router.setRoutes([
     path: "/waiting-confirm-to-start",
     component: "waiting-confirm-to-start-el",
   },
-  { path: "/play-game", component: "play-game-el" },
   { path: "/play-game-online", component: "play-game-online-el" },
 ]);
