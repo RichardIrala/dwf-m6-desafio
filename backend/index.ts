@@ -5,14 +5,12 @@ import { v4 as uuidv4 } from "uuid";
 // import * as cors from "cors";
 const port = process.env.PORT || 3000;
 const app = express();
-// const port = process.env.PORT;
+
 app.use(express.json());
-// app.use(cors());
 
 const usersCollection = db.collection("users");
 const roomsCollection = db.collection("rooms");
 
-//Permite hostear el index.html del front (por eso refiere a dist como objetivo)
 app.use(express.static("dist"));
 
 //NodeEnv devuelve el ambiente de desarrollo
@@ -40,11 +38,10 @@ app.post("/signup", (req, res) => {
           message: "User already exist",
         });
       }
-      // console.log(searchResponse);
     });
 });
 
-//Loguearse, en ese caso solo con el email
+//Loguearse, requiere email y userName
 app.post("/auth", (req, res) => {
   const { email, userName } = req.body;
   usersCollection
@@ -91,7 +88,6 @@ app.post("/rooms", (req, res) => {
           .then(() => {
             const roomId = 1000 + Math.floor(Math.random() * 999);
             const roomLongId = roomRef.key;
-            // console.log(roomRef.key);
             roomsCollection
               .doc(roomId.toString())
               .set({
@@ -140,11 +136,7 @@ app.get("/room/:id", (req, res) => {
 //Este EndPoint solicita el userId como query param, un roomId como paraámetro este debe ser el roomIdReal el cual deberia estar guardado en el state
 app.post("/rooms/:roomId", function (req, res) {
   const { userId } = req.query;
-  // const id = uuidv4();
-  // const fecha = Date.now();
-  // const user = req.body.user;
 
-  //Esto corrobora que le enviemos el queryParam userId
   usersCollection
     .doc(userId.toString())
     .get()
@@ -176,7 +168,7 @@ app.post("/rooms/:roomId", function (req, res) {
               !snap.val().player2
             ) {
               const userName = doc.data().nombre;
-              //aca lo que hacemos es crear los datos de juego con el userId para que nunca se repita, todo dentro de currentGame
+              //Player 2
               rtdb
                 .ref("/rooms/" + req.params.roomId + "/currentGame/player2")
                 .set(
@@ -185,7 +177,6 @@ app.post("/rooms/:roomId", function (req, res) {
                     choice: "",
                     online: true,
                     start: false,
-                    // date: fecha,
                   },
                   function () {
                     res.json({ message: "Hola jugador 2", player: 2 });
@@ -204,8 +195,6 @@ app.post("/rooms/:roomId", function (req, res) {
         res.json({ message: "Necesito que me envies un usuario valido" });
       }
     });
-
-  //este parametro roomId se refiere al verdadero ID el cual se adquiere con el EndPoint GetRealRoomId
 });
 
 //Elegir Jugada. Requiere el realRoomId, el userId como query param, la jugada y el userName en el body.
@@ -248,6 +237,7 @@ app.post("/rooms/:roomId/choice-play/", (req, res) => {
     });
 });
 
+//EndPoint para setear un start true || false
 app.post("/rooms/:roomId/set-start", (req, res) => {
   const { roomId } = req.params;
   const { userId } = req.query;
@@ -294,6 +284,8 @@ app.post("/rooms/:roomId/set-start", (req, res) => {
     });
   }
 });
+
+//Agregar 1 punto a X usuario
 app.post("/rooms/:roomId/addScore", (req, res) => {
   const { roomId } = req.params;
   const { userName } = req.body;
@@ -333,7 +325,7 @@ app.post("/rooms/:roomId/addScore", (req, res) => {
       }
     });
 });
-//Escuchar en el puerto indicado
+
 app.listen(port, () => {
   console.log("Escuchando en puerto", port);
 });
