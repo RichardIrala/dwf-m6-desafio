@@ -37,7 +37,6 @@ const state = {
   setState(newState) {
     this.data = newState;
     for (const cb of this.listeners) {
-      // console.log("SOy yo", cb);
       cb();
     }
   },
@@ -48,8 +47,6 @@ const state = {
   },
 
   addPuntos() {
-    //CHEQUEAR ESTE METODO 26/06/2022
-    //El juego ya esta casi finalizado, solo falta esto y luego limpiar código viejo. Y ordenar el código + optimizar lo que se pueda para mejor lectura y compresión de otros devs
     const cs = state.getState();
     const realRoomId = cs.roomRef;
     const userId = cs.me.userId;
@@ -84,29 +81,29 @@ const state = {
       width: 100vh;
       overflow: hidden;
     }
-    .pc-play-now {
+    .enemy-play-now {
       position: absolute;
       top: -10vh;
       left: 50%;
       transform: rotate(180deg) translate(50%);
       height: 45vh;
-      animation: pcMove 2s linear;
+      animation: enemyMove 2s linear;
     }
-    @keyframes pcMove {
+    @keyframes enemyMove {
       100% {
         top: 0;
       }
     }
-    .pc-play-fast {
+    .enemy-play-fast {
       position: absolute;
       top: -10vh;
       left: 50%;
       transform: rotate(180deg) translate(50%);
       height: 10vh;
-      animation: pcMoveFast 2s linear;
+      animation: enemyMoveFast 2s linear;
       z-index: 2;
     }
-    @keyframes pcMoveFast {
+    @keyframes enemyMoveFast {
       100% {
         top: 100vh;
       }
@@ -142,7 +139,7 @@ const state = {
     const jugadas = this.getState().rtdbData;
     const miPlayerNumber = Number(this.getState().myPlayerNumber - 1);
     const enemyPlayerNumber = Number(this.getState().enemyPlayerNumber) - 1;
-    function pcPlay() {
+    function enemyPlay() {
       if (jugadas[enemyPlayerNumber].choice == "piedra") {
         return piedra;
       } else if (jugadas[enemyPlayerNumber].choice == "papel") {
@@ -160,17 +157,16 @@ const state = {
         return tijera;
       }
     }
-    const pcPlayImage = pcPlay();
+    const enemyPlayerPlay = enemyPlay();
     const playerPlayImage = playerPlay();
-    // console.log(jugadas, "sSOMOSMOSMOS");
     if (
       jugadas[enemyPlayerNumber].choice != "" &&
       jugadas[miPlayerNumber].choice != ""
     ) {
       root.innerHTML = `
       <div class="container-animation-combat">
-        <img class="pc-play-now" src=${pcPlayImage}>
-        <img class="pc-play-fast" src=${pcPlayImage}>
+        <img class="enemy-play-now" src=${enemyPlayerPlay}>
+        <img class="enemy-play-fast" src=${enemyPlayerPlay}>
         <img class="player-play-now" src=${playerPlayImage}>
         <img class="player-play-fast" src=${playerPlayImage}>
       </div>
@@ -253,17 +249,14 @@ const state = {
     }
   },
   async setRoomRef(realRoomId) {
-    //ID de room en la realtimeDB
     const cs = this.getState();
     cs.roomRef = realRoomId;
     this.saveData(cs);
   },
   async listenDatabase() {
-    // rtdbFrontEnd;
     const currentGameRef = rtdbFrontEnd.ref(
       `/rooms/${this.data.roomRef}/currentGame`
     );
-    // console.log(roomLongId);
 
     //Este método indica a currentGameRef que escuche los cambios en /currentGame
     currentGameRef.on("value", (snapshot) => {
@@ -288,15 +281,14 @@ const state = {
         currentGame[1]?.online == true &&
         (pathActual == pathIngresarAUnaSala || pathActual == pathSalaDeEspera)
       ) {
-        //corregir problema
-        console.log("INGRESANDO AL JUEGO");
+        console.log("Ingresando al juego");
         Router.go(pathDelJuego);
       } else if (
         pathActual != pathSalaDeEspera &&
         pathActual != pathDelJuego &&
         (pathActual == pathIngresarAUnaSala || pathActual == pathInicioGame)
       ) {
-        console.log("INGRESANDO A UNA SALA DE ESPERA BRO");
+        console.log("Ingresando a la sala de espera");
         Router.go(pathSalaDeEspera);
       }
 
@@ -307,8 +299,6 @@ const state = {
       ) {
         Router.go(pathDeEleccionDePPOT);
       }
-
-      // this.checkStartValues();
     });
   },
   async getPlayerPoints() {
@@ -318,20 +308,11 @@ const state = {
     const scoresRef = rtdbFrontEnd.ref(`/rooms/${this.data.roomRef}/scores`);
     this.checkScoresInRealTime(scoresRef, userName, enemyName);
     return { message: "Valores Agregados al STATE" };
-    // const puntosRetornados = scoresRef.get().then((snap) => {
-    //   const snapVal = snap.val();
-    //   const misPuntos = snapVal[userName];
-    //   const susPuntos = snapVal[enemyName];
-    //   const puntos = { me: misPuntos, enemy: susPuntos };
-    //   return puntos;
-    // });
-
-    // return puntosRetornados;
   },
   saveData(rtdbData) {
     this.setState(rtdbData);
   },
-  //CHEQUEAR BIEN ESTE METODO
+
   checkScoresInRealTime(ref, myName, enemyName) {
     console.log(
       "%cQUE PASA QUE NO FUNCIONO LRPTM; QUE LO RE MIL PAR",
@@ -390,6 +371,7 @@ const state = {
         }
       });
   },
+
   newRoom() {
     const cs = this.getState();
     const { userId, userName } = cs.me;
@@ -420,7 +402,6 @@ const state = {
       .then((res) => res.json())
       .then((resJson) => {
         if (resJson.roomLongId ? true : false) {
-          //ACA AGREGO EL DATA.ROOM porque se confirma la existencia de la room y con eso basta
           this.setShortRoomId(id);
           const realRoomId = resJson.roomLongId;
           fetch("/rooms/" + realRoomId + `?userId=${userId}`, {
@@ -456,12 +437,13 @@ const state = {
                   this.listenDatabase();
                 }
               }
-            }); /*Probando si catch toma como error un 404, en este caso del endpoint de seteo de estado en una sala */
+            });
         } else {
           alert(resJson.message);
         }
       });
   },
+
   setEnemyName() {
     const cs = this.getState();
     cs.rtdbData.forEach((data) => {
@@ -476,6 +458,7 @@ const state = {
     const cs = this.getState();
     return { myName: cs.me.userName, enemyName: cs.enemyName };
   },
+
   getRtdbData() {
     const cs = this.getState();
     return cs.rtdbData;
@@ -509,6 +492,7 @@ const state = {
         console.log(resJson);
       });
   },
+
   async setStartFalse() {
     const cs = this.getState();
     const raw = JSON.stringify({ userName: cs.me.userName, status: false });
@@ -520,6 +504,7 @@ const state = {
       console.log(err);
     });
   },
+
   setMyPlayOnline(jugada: number) {
     const cs = this.getState();
 
@@ -534,7 +519,6 @@ const state = {
     const userId = cs.me.userId;
     const roomLongId = cs.roomRef;
     const raw = JSON.stringify({ jugada: myPlay, userName: cs.me.userName });
-    // console.log(raw);
     fetch(`/rooms/${roomLongId}/choice-play?userId=${userId}`, {
       method: "POST",
       headers: { "content-type": "application/json" },
@@ -551,13 +535,13 @@ const state = {
     const userId = cs.me.userId;
     const roomLongId = cs.roomRef;
     const raw = JSON.stringify({ jugada: "", userName: cs.me.userName });
-    // console.log(raw);
     fetch(`/rooms/${roomLongId}/choice-play?userId=${userId}`, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: raw,
     });
   },
+
   setShortRoomId(id) {
     const cs = this.getState();
     cs.shortRoomId = id;
