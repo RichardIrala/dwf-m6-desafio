@@ -44,60 +44,60 @@ customElements.define(
       });
       //
       const divTEMPORAL = document.createElement("div");
-      divTEMPORAL.innerHTML = `
-  <div class="header-all-content-container">
+      divTEMPORAL.innerHTML = /*html */ `
+        <div class="header-all-content-container">
 
-    <div class="header--my-name-container">
-      <span>Richard Miguel Irala</span>
-      <img class="computadora-icon" src=${computadoraIcon} alt="computadora logo">
-    </div>
+          <div class="header--my-name-container">
+            <span>Richard Miguel Irala</span>
+            <img class="computadora-icon" src=${computadoraIcon} alt="computadora logo">
+          </div>
 
-    <form class="header__form">
-      <div class="header__form__inputs">
-        <select class="header__form__inputs--select" name="headerForm">
-          <option value="jugar" selected>Jugar Piedra papel o Tijeras</option>
-          <option value="contactarme">Contactarme</option>
-        </select>
-        <input class="submit-icon" type="image" src=${submitIcon}>
-      </div>
-      <div class="header__form__spanText">
-       <span>Elige una de las opciones y presiona el botón</span>
-      </div>
-    </form>
-
-  </div>
-
-  <div class="main-container">
-
-    <div class="main-columns">
-      <h2 class="main-columns__titulo color-white">Esta página tiene distintas funcionalidades</h2>
-      ${infoColumns
-        .map((element) => {
-          console.log("Iteracion ");
-          return `
-          <div class="main-column">
-
-            <div class="main-column__number main-column__column--content color-white">
-              <span>${element.number}</span>
+          <form class="header__form">
+            <div class="header__form__inputs">
+              <select class="header__form__inputs--select" name="headerForm">
+                <option value="jugar" selected>Jugar Piedra papel o Tijeras</option>
+                <option value="contactarme">Contactarme</option>
+              </select>
+              <input class="submit-icon" type="image" src=${submitIcon}>
             </div>
-
-            <div class="main-column__titulo main-column__column--content color-white">
-              <h3>${element.title}</h3>
+            <div class="header__form__spanText">
+            <span>Elige una de las opciones y presiona el botón</span>
             </div>
+          </form>
 
-            <div class="main-column__C main-column__column--content color-white">
-              <img class="main-column__imagen" src=${element.image} alt="">
-              <span>${element.description}<span>
-            </div>
-        
-         </div>
-          `;
-        })
-        .join("")}
-      
-    </div>
-  </div>
-  `;
+        </div>
+
+        <div class="main-container">
+
+          <div class="main-columns">
+            <h2 class="main-columns__titulo color-white">Esta página tiene distintas funcionalidades</h2>
+            ${infoColumns
+              .map((element) => {
+                console.log("Iteracion ");
+                return `
+                <div class="main-column">
+
+                  <div class="main-column__number main-column__column--content color-white">
+                    <span>${element.number}</span>
+                  </div>
+
+                  <div class="main-column__titulo main-column__column--content color-white">
+                    <h3>${element.title}</h3>
+                  </div>
+
+                  <div class="main-column__C main-column__column--content color-white">
+                    <img class="main-column__imagen" src=${element.image} alt="">
+                    <span>${element.description}<span>
+                  </div>
+              
+              </div>
+                `;
+              })
+              .join("")}
+            
+          </div>
+        </div>
+      `;
       // divPadre.appendChild(buttonEl);
       divPadre.appendChild(divTEMPORAL);
       this.shadow.appendChild(divPadre);
