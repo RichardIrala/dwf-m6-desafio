@@ -1,5 +1,3 @@
-import { Router } from "@vaadin/router";
-import Swal from "sweetalert2";
 import { state } from "../../state";
 
 const fondoDelJuego = require("url:../../components/imgs/fondo.svg");

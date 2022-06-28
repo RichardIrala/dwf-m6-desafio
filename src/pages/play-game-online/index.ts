@@ -9,9 +9,7 @@ customElements.define(
     shadow = this.attachShadow({ mode: "open" });
     constructor() {
       super();
-      //Renderiza el customElement
       this.render();
-      //Lo utilizo para agregar eventListeners necesarios para que mi CustomElement haga ciertas acciones.
       this.addListeners();
     }
     render() {
@@ -80,26 +78,15 @@ customElements.define(
           clearInterval(intervalId);
 
           setTimeout(() => {
-            //Se remueve el contador 3-2-1
-            // div.removeChild(divDelSpan);
-            //Se renderiza la animación de las elecciones de cada jugador
             state.renderAnimationCombat();
-
-            /* state.consola(); */
           }, 500);
 
           setTimeout(() => {
-            //Se renderiza la tabla que menciona quien gano, y muestra los puntos actuales de Victorias vs Derrotas
-
             state.renderGanador();
-
             state.setMyEmptyPlayOnline();
-            /* state.consola(); */
           }, 4000);
         }
       }, 1000);
-
-      //state.resultado y state.getJugada
     }
     addListeners() {}
   }

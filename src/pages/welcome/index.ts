@@ -22,7 +22,7 @@ const infoColumns = [
   },
 ];
 
-//Esta es la página de bienvenida, con mi presentación, el desafio no lo pide pero es un extra que le agregue, sumado a la page de notas con tareas y el formulario de contacto
+//Esta es la página de bienvenida
 customElements.define(
   "welcome-el",
   class extends HTMLElement {
@@ -35,7 +35,6 @@ customElements.define(
     render() {
       this.shadow.innerHTML = ``;
       const divPadre = document.createElement("div");
-      // divPadre.classList.add("div-padre");
       const buttonEl = document.createElement("button");
       buttonEl.textContent = `Inicio Game`;
       buttonEl.addEventListener("click", () => {

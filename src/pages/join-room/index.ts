@@ -2,7 +2,6 @@ import { Router } from "@vaadin/router";
 import { state } from "../../state";
 
 const fondoDelJuego = require("url:../../components/imgs/fondo.svg");
-//SEGUIR CON ESTA PAGINA, HACER QUE ESTA PAGINA SE TRANSFORME ENTRE ENTRAR A UN ROOM Y CREAR ROOM
 //Inicio el juego de piedra papel o tijeras
 customElements.define(
   "join-room-el",
@@ -99,7 +98,6 @@ customElements.define(
             //roomId es el name del input del formulario
             const roomId = e.target["roomId"].value;
             state.joinRoom(roomId);
-            // Router.go("/inicio-game");
           } else {
             //Alerta de que faltan casillas
             const formAlert = this.shadow.querySelectorAll(".display--none");

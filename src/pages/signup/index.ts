@@ -117,7 +117,7 @@ customElements.define(
 
             state.signup(email, nombre);
           } else {
-            //Alerta de que faltan casillas
+            //Si no se completan las casillas salta este mensaje
             const formAlert = this.shadow.querySelectorAll(".display--none");
             formAlert.forEach((input) => {
               if (input.classList.contains("display--initial") == false) {

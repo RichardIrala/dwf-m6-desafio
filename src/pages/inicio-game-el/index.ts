@@ -44,7 +44,6 @@ customElements.define(
     }
     addListeners() {
       this.shadow.querySelector(".new-game").addEventListener("click", () => {
-        // Router.go("/game-instructions");
         console.log("nuevo juego");
         state.newRoom();
       });

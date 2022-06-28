@@ -58,7 +58,6 @@ customElements.define(
         .querySelector("game-button-blue")
         .addEventListener("click", () => {
           state.setReadyToPlay();
-          //AGREGAR el state que consume el fetch que actualiza el estado de jugar a "TRUE", para que luego el juego lo tome y comiencen los chicos a jugar
         });
     }
   }
