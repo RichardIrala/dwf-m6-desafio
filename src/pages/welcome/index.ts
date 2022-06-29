@@ -31,6 +31,7 @@ customElements.define(
       super();
       this.render();
       this.addListeners();
+      // this.shadow.innerHTML = `<game-instructions-el></game-instructions-el>`;
     }
     render() {
       this.shadow.innerHTML = ``;

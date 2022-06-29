@@ -15,11 +15,11 @@ customElements.define(
     render() {
       document.querySelector(".root").innerHTML = ``;
       this.shadow.innerHTML = ``;
-      const div = document.createElement("div");
-      div.classList.add("principal-container");
       const style = document.createElement("style");
       const playerNames = state.getPlayerNames();
-      div.innerHTML = `
+      this.shadow.innerHTML = `
+      <homepage-icon></homepage-icon>
+      <div class="principal-container">
         <header-in-game-el></header-in-game-el>
         <div>
           <p class="instructions">
@@ -31,7 +31,7 @@ customElements.define(
           </p>
         </div>
         <ppot-el></ppot-el>
-        <homepage-icon></homepage-icon>
+      </div>
       `;
       style.innerHTML = `
         * {
@@ -41,12 +41,11 @@ customElements.define(
         .principal-container {
           background: url(${fondoDelJuego});
           background-size: cover;
-          height: 100vh;
+          min-height: 100vh;
           display: flex;
           flex-direction: column;
           align-items: center;
-          justify-content: center;
-          gap: 74px;
+          justify-content: space-between;
           padding-top: 115px;
         }
         .instructions {
@@ -60,7 +59,6 @@ customElements.define(
         }
       `;
 
-      this.shadow.appendChild(div);
       this.shadow.appendChild(style);
     }
     addListeners() {}

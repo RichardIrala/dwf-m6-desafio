@@ -14,15 +14,19 @@ customElements.define(
       this.render();
       this.addEventsInPpot();
       const style = document.createElement("style");
+      const alturaDelPPOT = "126px";
       style.innerHTML = `
         .imgs-container {
-          position: absolute;
-          bottom: 0;
-          right: 50%;
-          transform: translate(50%, 0);
+          height: 200px;
+          display: flex;
+          flex-direction: column;
+          justify-content: flex-end;
+        }
+        .imgs-content {
+          
         }
         .ppot {
-          height: 126px;
+          height: ${alturaDelPPOT};
           width: auto;
         }
         .ppot:hover {
@@ -36,6 +40,9 @@ customElements.define(
             transform: translate(0px, -50px);
           }
         }
+        .display-none {
+          display: none;
+        }
       `;
       this.shadow.appendChild(style);
     }
@@ -44,9 +51,11 @@ customElements.define(
       const div = document.createElement("div");
       div.classList.add("imgs-container");
       div.innerHTML = `
-      <img class="ppot" src=${piedra}>
-      <img class="ppot" src=${papel}>
-      <img class="ppot" src=${tijera}>
+      <div class="imgs-content">
+        <img class="ppot ppot-event" src=${piedra}>
+        <img class="ppot ppot-event" src=${papel}>
+        <img class="ppot ppot-event" src=${tijera}>
+      </div>
       `;
       this.shadow.appendChild(div);
     }
@@ -56,23 +65,29 @@ customElements.define(
     }
 
     addEventsInPpot() {
-      const ppotEls = this.shadow.querySelectorAll(".ppot");
+      const ppotEls = this.shadow.querySelectorAll(".ppot-event");
 
       ppotEls.forEach((e, eIndex) => {
         e.addEventListener("click", () => {
           const pathActual = location.pathname;
           const pathDelJuegoOnline = "/play-game-online";
-          console.log(pathActual, "soy el path actual brother xd");
+          console.log(pathActual, "soy el path actual");
           if (pathActual == pathDelJuegoOnline) {
             //Aca va el endpoint de choice play
-            console.log("FUNCIONOOOO");
+            console.log("Soy eleccion de jugada");
+            efectoDeElegirJugada(eIndex);
             state.setMyPlayOnline(eIndex);
           }
-          // //Este evento se lanza cuando elige el jugador una de las 3 opciones del juego P-P o tijera(T)
-          // state.setJugada(eIndex);
-          // state.computerSetJugada(Math.floor(Math.random() * 3));
         });
       });
+
+      function efectoDeElegirJugada(indexElClicked) {
+        ppotEls.forEach((e, eIndex, allElements) => {
+          if (allElements[indexElClicked] != e) {
+            e.classList.add("display-none");
+          }
+        });
+      }
     }
   }
 );

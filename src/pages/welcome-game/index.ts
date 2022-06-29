@@ -14,12 +14,12 @@ customElements.define(
     }
     render() {
       this.shadow.innerHTML = ``;
-      const div = document.createElement("div");
+      // const div = document.createElement("div");
       const style = document.createElement("style");
-      div.classList.add("principal-container");
-
-      div.innerHTML = ` 
-        <homepage-icon></homepage-icon>
+      // div.classList.add("principal-container");
+      this.shadow.innerHTML = `
+      <homepage-icon></homepage-icon>
+      <div class="principal-container">
         <game-title></game-title>
         <form class="form-new-room">
             <label class="form-new-room__my-email--label">
@@ -39,7 +39,8 @@ customElements.define(
             </button>
             <span class="registrarse">¿No estás registrado? haz click aqui.</span>
         </form>
-      `;
+      </div>`;
+      // div.innerHTML = ``;
       style.innerHTML = `
         * { 
             box-sizing: border-box;
@@ -52,7 +53,6 @@ customElements.define(
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 74px;
           gap: 50px;
           padding: 50px 0px;
         }
@@ -102,7 +102,7 @@ customElements.define(
           background: rgba(0, 144, 72, 1);
         }
       `;
-      this.shadow.appendChild(div);
+      // this.shadow.appendChild(div);
       this.shadow.appendChild(style);
     }
     addListeners() {

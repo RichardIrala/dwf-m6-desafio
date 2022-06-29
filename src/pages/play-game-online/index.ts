@@ -14,22 +14,38 @@ customElements.define(
     }
     render() {
       this.shadow.innerHTML = ``;
-      const div = document.createElement("div");
-      div.classList.add("principal-container");
+
       const style = document.createElement("style");
-      div.innerHTML = `
+      this.shadow.innerHTML = `
+      <div class="principal-container">
+        <div></div>
+        <div class="counter-container"></div>
         <ppot-el></ppot-el>
+      </div>
+        
       `;
       style.innerHTML = `
         * {
           margin: 0;
           box-sizing: border-box;
         }
+
+        .principal-container {
+          background: url(${fondoDelJuego});
+          background-size: cover;
+          min-height: 100vh;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: space-between;
+          padding-top: 115px;
+        }
+
         .play-game__contador-container {
           display: flex; justify-content: center; align-items: center;
           width: 243px; height: 243px;
           font-size: 64px;
-          position: absolute; top: 50%; transform: translate(0 , -50%);
+          
           border-radius: 50%;
           background: green;
           animation: specialAnimation 4s linear;
@@ -48,25 +64,14 @@ customElements.define(
             background: red;
           }
         }
-        .principal-container {
-          background: url(${fondoDelJuego});
-          background-size: cover;
-          height: 100vh;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 74px;
-          padding-top: 115px;
-        }
       `;
 
-      this.shadow.appendChild(div);
       this.shadow.appendChild(style);
 
       let counter = 3;
       const divDelSpan = document.createElement("div");
       divDelSpan.classList.add("play-game__contador-container");
-      div.appendChild(divDelSpan);
+      this.shadow.querySelector(".counter-container").appendChild(divDelSpan);
 
       state.getPlayerPoints();
 

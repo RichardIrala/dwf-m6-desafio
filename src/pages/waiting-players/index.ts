@@ -27,9 +27,10 @@ customElements.define(
           <p class="instructions instructions--roomId">${state.getShortRoomId()}</p>
           <p class="instructions">Con tu contrincante</p>
         </div>
-        <ppot-el></ppot-el>
+        
         <homepage-icon></homepage-icon>
       `;
+
       style.innerHTML = `
         * {
           margin: 0;
@@ -38,7 +39,7 @@ customElements.define(
         .principal-container {
           background: url(${fondoDelJuego});
           background-size: cover;
-          height: 100vh;
+          min-height: 100vh;
           display: flex;
           flex-direction: column;
           align-items: center;
