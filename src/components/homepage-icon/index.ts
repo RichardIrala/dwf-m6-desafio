@@ -28,6 +28,7 @@ customElements.define(
           cursor: pointer;
         }
         .homepage-icon {
+          z-index: 100;
           width: 80px;
           position: fixed;
           right: 2vw;
