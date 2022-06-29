@@ -132,9 +132,7 @@ customElements.define(
         }
         
         .game-results__volver-a-jugar {
-          position: absolute;
-          left: 50%; bottom: 5%;
-          transform: translate(-50%);
+          
         }
       `;
       this.shadow.appendChild(style);
